@@ -17,13 +17,13 @@ echo "Downloading JSON from ARTE API…"
 JSON=$(curl -s https://api.arte.tv/api/player/v1/config/de/$SHORTCODE)
 
 TITLE=$(echo $JSON | jq -r '.videoJsonPlayer.VTI')
-FILES=$(echo $JSON | jq '.videoJsonPlayer.VSR | map({quality: .quality, width: .width, height: .height, mediaType: .mediaType, bitrate: .bitrate, url: .url})' )
+FILES=$(echo $JSON | jq '.videoJsonPlayer.VSR | map({version: .versionLibelle, quality: .quality, width: .width, height: .height, mediaType: .mediaType, bitrate: .bitrate, url: .url})' )
 
 echo ""
 echo -e "${BRed}$TITLE${NC}"
 
 # Extract Qualities and URLS
-QUALITIES=$(echo $FILES | jq -r '.[] | ("Quality \(.quality) \(.mediaType) (\(.width) x \(.height) @ \(.bitrate)fps)")')
+QUALITIES=$(echo $FILES | jq -r '.[] | ("\(.version) (Quality \(.quality) \(.mediaType) \(.width) x \(.height) @ \(.bitrate)fps)")' | nl -s ': ' )
 NUMBER_OF_QUALITIES=$(echo $FILES | jq length)
 echo -e "Available qualities: \n$QUALITIES"
 read -p "$(tput setaf 4)Choose quality (1-$NUMBER_OF_QUALITIES) $(tput sgr0)" CHOSEN_QUALITY
