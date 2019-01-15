@@ -6,7 +6,8 @@ BRed="\033[1;31m"         # RED
 NC='\033[0m' # No Color
 
 echo -e "${BRed}ARTE.tv downloader${NC}"
-read -p "$(tput setaf 4)Paste the URL here: $(tput sgr0)" URL
+URL="$1"
+[ -z "$URL" ] && read -p "$(tput setaf 4)Paste the URL here: $(tput sgr0)" URL
 
 # Extract shortcode from URL
 SHORTCODE=$(echo "$URL" | sed --regexp-extended 's/.*arte.tv\/.+\/videos\/([a-zA-Z0-9\-]+)\/.*/\1/')
