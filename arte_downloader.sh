@@ -20,8 +20,7 @@ JSON=$(curl -s https://api.arte.tv/api/player/v1/config/de/$SHORTCODE)
 TITLE=$(echo $JSON | jq -r '.videoJsonPlayer.VTI')
 FILES=$(echo $JSON | jq '.videoJsonPlayer.VSR | map({version: .versionLibelle, quality: .quality, width: .width, height: .height, mediaType: .mediaType, bitrate: .bitrate, url: .url})' )
 
-echo ""
-echo -e "${BRed}$TITLE${NC}"
+echo -e "\n${BRed}$TITLE${NC}"
 
 # Extract Qualities and URLS
 QUALITIES=$(echo $FILES | jq -r '.[] | ("\(.version) (Quality \(.quality) \(.mediaType) \(.width) x \(.height) @ \(.bitrate)fps)")' | nl -s ': ' )
@@ -33,7 +32,7 @@ SELECTED_FILE=$(echo $FILES | jq '.['$CHOSEN_QUALITY-1']')
 SELECTED_URL=$(echo $SELECTED_FILE | jq -r '.url')
 SELECTED_FORMAT=$(echo $SELECTED_FILE | jq -r '.mediaType')
 CLEANED_NAME=$(echo $TITLE | sed -e 's/[^A-Za-z0-9._-]/_/g')
-OUTPUT_FILE=$(echo $CLEANED_NAME.$SELECTED_FORMAT)
+OUTPUT_FILE="$CLEANED_NAME.$SELECTED_FORMAT"
 
 # Download
 echo -e "${BRed}Saving file as $(pwd)/$OUTPUT_FILE...${NC}"
