@@ -31,9 +31,9 @@ read -p "$(tput setaf 4)Choose quality (1-$NUMBER_OF_QUALITIES) $(tput sgr0)" CH
 SELECTED_FILE=$(echo $FILES | jq '.['$CHOSEN_QUALITY-1']')
 SELECTED_URL=$(echo $SELECTED_FILE | jq -r '.url')
 SELECTED_FORMAT=$(echo $SELECTED_FILE | jq -r '.mediaType')
-CLEANED_NAME=$(echo $TITLE | sed -e 's/[^A-Za-z0-9._-]/_/g')
+CLEANED_NAME=$(echo $TITLE | sed -e 's/[:\/]/_/g')
 OUTPUT_FILE="$CLEANED_NAME.$SELECTED_FORMAT"
 
 # Download
 echo -e "${BRed}Saving file as $(pwd)/$OUTPUT_FILE...${NC}"
-curl -C - -L $SELECTED_URL -o $OUTPUT_FILE --progress-bar
+curl -C - -L $SELECTED_URL -o "$OUTPUT_FILE" --progress-bar
