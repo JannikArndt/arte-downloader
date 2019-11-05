@@ -1,21 +1,34 @@
 #!/bin/bash
 
+# curl jq sed requested !
+
 set -e
 
-BRed="\033[1;31m"         # RED
-NC='\033[0m' # No Color
+# STORE=$(pwd)
+
+STORE="$HOME/Videos/Arte"
+mkdir -p $STORE
+
+BRed="\033[1;31m" # RED
+NC='\033[0m'      # No Color
 
 echo -e "${BRed}ARTE.tv downloader${NC}"
 URL="$1"
 [ -z "$URL" ] && read -p "$(tput setaf 4)Paste the URL here: $(tput sgr0)" URL
 
 # Extract shortcode from URL
-SHORTCODE=$(echo "$URL" | sed --regexp-extended 's/.*arte.tv\/.+\/videos\/([a-zA-Z0-9\-]+)\/.*/\1/')
-echo "Shotcode: $SHORTCODE"
-echo "Downloading JSON from ARTE API…"
+LANG_SHORTCODE=$(echo "$URL" | sed -E 's/^https?:\/\/www\.arte.tv\/(\w\w)\/videos\/([^/]*)\/.*$/\1\/\2/')
+JSON_URL="https://api.arte.tv/api/player/v1/config/$LANG_SHORTCODE"
+cat << EOT
+
+Shortcode: $LANG_SHORTCODE
+Downloading JSON from :
+$JSON_URL
+
+EOT
 
 # Download JSON with Video Data
-JSON=$(curl -s https://api.arte.tv/api/player/v1/config/de/$SHORTCODE)
+JSON=$(curl -s $JSON_URL)
 
 TITLE=$(echo $JSON | jq -r '.videoJsonPlayer.VTI')
 FILES=$(echo $JSON | jq '.videoJsonPlayer.VSR | map({version: .versionLibelle, quality: .quality, width: .width, height: .height, mediaType: .mediaType, bitrate: .bitrate, url: .url})' )
@@ -33,8 +46,8 @@ SELECTED_URL=$(echo $SELECTED_FILE | jq -r '.url')
 SELECTED_FORMAT=$(echo $SELECTED_FILE | jq -r '.mediaType')
 SELECTED_VERSION=$(echo $SELECTED_FILE | jq -r '.version')
 CLEANED_NAME=$(echo "$TITLE ($SELECTED_VERSION)" | sed -e 's/[<>:"/\|?*]/_/g')
-OUTPUT_FILE="$CLEANED_NAME.$SELECTED_FORMAT"
+OUTPUT_FILE="$STORE/$CLEANED_NAME.$SELECTED_FORMAT"
 
 # Download
-echo -e "${BRed}Saving file as $(pwd)/$OUTPUT_FILE...${NC}"
+echo -e "${BRed}Saving file as $OUTPUT_FILE...${NC}"
 curl -C - -L $SELECTED_URL -o "$OUTPUT_FILE" --progress-bar

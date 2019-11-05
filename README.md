@@ -1,6 +1,6 @@
 # Arte Downloader
 
-Since movies in German public television are only available online for a _limited_ amount of time, you might want to download something before it's gone. This helps.
+Since movies in European public television are only available online for a _limited_ amount of time, you might want to download something before it's gone. This can help you.
 
 # How-To
 
