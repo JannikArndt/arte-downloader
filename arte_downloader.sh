@@ -23,7 +23,6 @@ FILES=$(echo $JSON | jq '.data.attributes.streams | map({version: .versions[0].l
 
 echo -e "\n${BRed}$TITLE${NC}"
 
-echo $FILES
 # Extract Qualities and URLS
 QUALITIES=$(echo $FILES | jq -r '.[] | ("\(.version) (Quality \(.quality))")' | nl -s ': ' )
 NUMBER_OF_QUALITIES=$(echo $FILES | jq length)
@@ -33,16 +32,9 @@ read -p "$(tput setaf 4)Choose quality (1-$NUMBER_OF_QUALITIES) $(tput sgr0)" CH
 
 SELECTED_FILE=$(echo $FILES | jq '.['$CHOSEN_QUALITY-1']')
 SELECTED_URL=$(echo $SELECTED_FILE | jq -r '.url')
-
-
-echo $SELECTED_URL
-echo $SELECTED_FILE
-
 SELECTED_VERSION=$(echo $SELECTED_FILE | jq -r '.version')
 CLEANED_NAME=$(echo "$TITLE ($SELECTED_VERSION)" | sed -e 's/[<>:"/\|?*]/_/g')
 
-yt-dlp "$SELECTED_URL" --all-subs -o "$CLEANED_NAME.%(ext)s" 
-
-
 # Download
+yt-dlp "$SELECTED_URL" --all-subs -o "$CLEANED_NAME.%(ext)s" 
 echo -e "${BRed}File saved in current directory, with available subtitles${NC}"
